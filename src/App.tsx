@@ -3,6 +3,7 @@ import { Layout, Typography, Row, Col, Card, Statistic, Table, Button, ConfigPro
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Image, Video, Music, FileText, File, HardDrive, Clock, Sun, Moon } from 'lucide-react';
 import api from './api';
+import ResourceDetailModal from './components/ResourceDetailModal';
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -85,6 +86,7 @@ function App() {
   const [trendData, setTrendData] = useState<TrendData[]>([]);
   const [resourceListData, setResourceListData] = useState<ResourceData[]>([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [selectedResourceId, setSelectedResourceId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -108,6 +110,12 @@ function App() {
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
+
+  const onRowClick = (record: any) => ({
+    onClick: () => {
+      setSelectedResourceId(record.key);
+    },
+  });
 
   if (!materialCounts) {
     return <div>Loading...</div>;
@@ -200,10 +208,18 @@ function App() {
           </Card>
           <Card className="mt-6">
             <Title level={4}>资源列表</Title>
-            <Table columns={columns} dataSource={resourceListData} />
+            <Table 
+              columns={columns} 
+              dataSource={resourceListData} 
+              onRow={onRowClick}
+            />
           </Card>
         </Content>
       </Layout>
+      <ResourceDetailModal
+        resourceId={selectedResourceId}
+        onClose={() => setSelectedResourceId(null)}
+      />
     </ConfigProvider>
   );
 }
